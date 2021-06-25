@@ -1,0 +1,85 @@
+<html>
+
+<head>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="./moment.js"></script>
+</head>
+
+
+<body>
+    <div>饼状图</div>
+</body>
+<script>
+
+let width = 600;
+		let height = 600;
+		let dataset = [ 30 , 10 , 43 , 55 , 13 ];
+		
+		let svg = d3.select("body").append("svg")
+								.attr("width",width)
+								.attr("height",height)
+                                .attr('viewBox','-100 -100 600 600');
+		
+		let pie = d3.layout.pie();
+		
+		let outerRadius = (width-200) / 2; // 外半径
+		let innerRadius = (width-200) / 4; // 内半径
+		let arc = d3.svg.arc()  // 定义一个弧线函数arc，并把内外半径给它
+						.innerRadius(innerRadius)
+						.outerRadius(outerRadius);
+		
+		let color = d3.scale.category10();// 定义表示颜色的序数比例尺
+		
+		let arcs = svg.selectAll("g")
+					  .data(pie(dataset))  // 将数据转换为layout中pie以后的数据
+					  .enter()
+					  .append("g")
+					  .attr("transform","translate("+outerRadius+","+outerRadius+")");
+					  
+		arcs.append("path") // arcs同时会有5个g元素，所以append("path") 后，是每个g中都有path
+			.attr("fill",function(d,i){
+				return color(i);
+			})
+			.attr("d",function(d){
+				return arc(d);
+			})
+            .on("mouseover",function(d,i){
+                d3.select(this)
+				  .attr("d",d3.svg.arc()  // 定义一个弧线函数arc，并把内外半径给它
+						.innerRadius(innerRadius)
+						.outerRadius(outerRadius+5)
+                  );
+
+				// d3.select(this)
+				//   .attr("fill","yellow");
+		   })
+		   .on("mouseout",function(d,i){
+				// d3.select(this)
+				//   .transition()
+		        //   .duration(500)
+				//   .attr("fill",color(i));
+                d3.select(this)
+				  .attr("d", function(d){
+				return arc(d);
+			});
+		   }) ;
+		
+		arcs.append("text")
+			.attr("transform",function(d){
+				return "translate(" + arc.centroid(d) + ")";
+			})
+			.attr("text-anchor","middle")
+			.text(function(d){
+				return d.value;
+			});
+		
+		console.log(dataset);
+		console.log(pie(dataset));
+</script>
+
+
+<style>
+
+</style>
+
+</html>
